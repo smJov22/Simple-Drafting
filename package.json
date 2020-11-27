@@ -1,0 +1,8 @@
+{
+    "name": "simple-draft",
+    "version": "0.0.1",
+    "description": "Using Node and socket.io to create a simple drafting platform",
+    "dependencies": {
+        "socket.io": "^3.0.3"
+    }
+}
