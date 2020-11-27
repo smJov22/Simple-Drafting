@@ -27,6 +27,9 @@ $(function () {
 $(function () {
     var socket = io();
     socket.on('gen cards', function(cards) {
-        $('#public').html(cards);
+        console.log(cards.length);
+        for(let key in cards) {
+            $('#public').append(cards[key]);
+        }
     });
 });

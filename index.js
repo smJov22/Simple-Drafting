@@ -12,17 +12,18 @@ app.get('/', (req,res) => {
     res.sendFile(__dirname + '/index.html');
 });
 
-let cards = "";
 let packSize = 4;
+let cards = genCardHtml(packSize);
 
 io.on('connection', (socket) => {
     console.log("new connection: ", socket.id);
-    if(cards === "") {
+    if(cards.length == 0) {
         cards = genCardHtml(packSize); 
     }
-    io.emit('gen cards', cards);
-    
+    socket.emit('gen cards', cards);
+
     socket.on('disconnect', () => {
+        socket.removeAllListeners();
         console.log("user disconnected");
     });
     //chat message handling
@@ -31,6 +32,7 @@ io.on('connection', (socket) => {
     });
     //card draft handling
     socket.on('card drafted', (id) => {
+        delete cards[id];
         socket.broadcast.emit("card drafted", id);
     });
     
@@ -44,9 +46,9 @@ http.listen(port, () => {
 function genCardHtml (num) {
     console.log("genning cards");
     const colourArray = ['green','blue','yellow','red'];
-    let cardHtml = '';
+    let cardHtml = {};
     for(let i=0; i<num; i++) {
-        cardHtml += `<div class="card card-${colourArray[i%4]}" id="${i}"></div>`
+        cardHtml[i]=`<div class="card card-${colourArray[i%4]}" id="${i}"></div>`;
     }
     return cardHtml;
 }
