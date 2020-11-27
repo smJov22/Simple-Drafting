@@ -5,6 +5,8 @@
 
 body {
     font: 13px Helvetica, Arial;
+    display: flex;
+    flex-direction: row;
 }
 
 form {
@@ -28,4 +30,40 @@ form button {
 
 #messages li:nth-child(odd) {
     background: #eee; 
+}
+
+.card {
+    height:360px;
+    width:240px;
+}
+
+.card-blue {
+    background: blue;
+}
+
+.card-green {
+    background: green;
+}
+
+.card-yellow {
+    background: yellow;
+}
+
+.card-red {
+    background: red;
+}
+
+.card-holder {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    width: 50%;
+}
+
+#public {
+    background: #999999;
+}
+
+#user {
+    background: ivory;
 }
