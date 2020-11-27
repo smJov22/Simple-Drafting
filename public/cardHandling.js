@@ -11,13 +11,22 @@ $(function () {
     });
 });
 
+//handles cards being clicked on and taken out of the draft pool
 $(function () {
     var socket = io();
-    $('.card').on('click', function() {
+    $(document).on('click', '.card', function() {
         $('#user').append($(this).detach());
         socket.emit('card drafted', $(this).attr('id'));
     });
     socket.on('card drafted', function(id) {
         $('#' + id).remove();
+    });
+});
+
+//handles adding cards to DOM
+$(function () {
+    var socket = io();
+    socket.on('gen cards', function(cards) {
+        $('#public').html(cards);
     });
 });
