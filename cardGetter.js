@@ -20,15 +20,22 @@ function getCardImagePaths () {
 }
 
 function pickPack (cardPool, packSize) {
-    let pack = {};
+    let newPack = {};
     for(let i=0; i<packSize; i++) {
         let rand = Math.floor(Math.random() * packSize);
         let card = cardPool[rand];
         console.log(card);
-        pack[i]=`<div class="card" id="${i}" style='background-image:url("${card}")'></div>`;
-        cardPool.splice(rand,1);
+        newPack[i]=`<div class="card" id="${i}" style='background-image:url("${card}")'></div>`;
+        cardPool.splice(rand,1);      
     }
-    return pack;
+    let newPool = cardPool;
+    return {newPack, newPool};
+}
+
+//pool : an array of card paths
+//pack : a dictionary of id:cardHTML(string) pairs
+function removePackFromPool (pack, pool) {
+
 }
 
 module.exports.getCardImagePaths = getCardImagePaths;

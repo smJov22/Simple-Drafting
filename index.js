@@ -19,11 +19,16 @@ let packSize = 15;
 let cards = {};
 let users = [];
 let userNum = 0;
+//todo - max drafter implementation
+let maxDrafters = 2;
 
 io.on('connection', (socket) => {
     console.log("new connection: ", socket.id);
     if(users.length == 0) {
-        cards = cardGetter.pickPack(cardPool,packSize);
+        let {newPack, newPool} = cardGetter.pickPack(cardPool,packSize);
+        cardPool = newPool;
+        console.log("new cardpool size = ", cardPool.length);
+        cards = newPack;
     }
     socket.emit('gen cards', cards);
     socket.emit('chat message', socket.id);
@@ -63,11 +68,15 @@ http.listen(port, () => {
 
 function nextDrafter () {
     //probably doesn't work if drafters leave mid way through (users array only adds, doesn't remove upon clients leaving)
-    console.log('userNum, totalUsers: ',userNum,', ', users.length)
     userNum++;
     return users[(userNum)%users.length];
 }
-/*----FEATURE REQUESTS----*/
+/*----FUTURE FEATURES----*/
 
-//retrieve 45 cards from the cube
 //make non-repeating random packs of 15 from the cards
+//each player gets a pack (like real drafting)
+//variable player cap (refuse entry to additional clients)
+//stop and reset if someone leaves
+
+//login page
+//get it hosted on AWS

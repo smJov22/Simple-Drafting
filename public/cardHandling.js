@@ -31,7 +31,6 @@ $(function () {
 //handles adding cards to DOM
 $(function () {
     socket.on('gen cards', function(cards) {
-        console.log(cards.length);
         for(let key in cards) {
             $('#public').append(cards[key]);
         }
