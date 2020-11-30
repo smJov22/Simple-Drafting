@@ -6,6 +6,8 @@ const app = express();
 const http = require("http").createServer(app);
 const io = require("socket.io")(http);
 
+const cardGetter = require("./cardGetter.js");
+
 app.use(express.static('public'));
 
 app.get('/', (req,res) => {
@@ -16,6 +18,10 @@ let packSize = 4;
 let cards = genCardHtml(packSize);
 let users = [];
 let userNum = 0;
+
+//TEST
+
+cardGetter.getCardImagePaths();
 
 io.on('connection', (socket) => {
     console.log("new connection: ", socket.id);
@@ -75,8 +81,6 @@ function nextDrafter () {
     return users[(userNum)%users.length];
 }
 /*----FEATURE REQUESTS----*/
-
-//take turns in drafting
 
 //retrieve 45 cards from the cube
 //make non-repeating random packs of 15 from the cards
