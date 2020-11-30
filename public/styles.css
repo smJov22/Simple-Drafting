@@ -35,6 +35,7 @@ form button {
 .card {
     height:360px;
     width:240px;
+    background-size: 100% 100%;
 }
 
 .card-blue {

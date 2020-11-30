@@ -12,13 +12,24 @@ function getCardImagePaths () {
         } 
         //listing all files using forEach
         files.forEach(function (file) {
-            // Do whatever you want to do with the file
-            let card = path.join('/public/cards',file);
-            cards.push(card);
-            console.log(card); 
+            let card = path.join('/cards/',file);
+            cards.push(card); 
         });
-        return cards;
     });
+    return cards;
+}
+
+function pickPack (cardPool, packSize) {
+    let pack = {};
+    for(let i=0; i<packSize; i++) {
+        let rand = Math.floor(Math.random() * packSize);
+        let card = cardPool[rand];
+        console.log(card);
+        pack[i]=`<div class="card" id="${i}" style='background-image:url("${card}")'></div>`;
+        cardPool.splice(rand,1);
+    }
+    return pack;
 }
 
 module.exports.getCardImagePaths = getCardImagePaths;
+module.exports.pickPack = pickPack;
