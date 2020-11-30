@@ -17,6 +17,7 @@ $(function () {
 $(function () {
     $(document).on('click', '.card', function() {
         if(nextPick && $(this).parent('#public').length)  {
+            $('#public').empty();
             $('#user').css("background", "ivory");
             $('#user').append($(this).detach());
             socket.emit('card drafted', $(this).attr('id'));
@@ -40,8 +41,11 @@ $(function () {
 
 //handles becoming the active drafter
 $(function () {
-    socket.on('next pick', function() {
+    socket.on('next pick', function(cards) {
         nextPick = true;
         $('#user').css("background", "cyan");
+        for(let key in cards) {
+            $('#public').append(cards[key]);
+        }
     });
 });

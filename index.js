@@ -15,23 +15,27 @@ app.get('/', (req,res) => {
 });
 
 let cardPool = cardGetter.getCardImagePaths();
-let packSize = 15;
-let cards = {};
-let users = [];
+let cardsInPacks = 0;
+
+let packs = [];
+
+let users = {};
 let userNum = 0;
 //todo - max drafter implementation
-let maxDrafters = 2;
+const maxDrafters = 2;
+const packSize = 15;
 
 io.on('connection', (socket) => {
     console.log("new connection: ", socket.id);
-    if(users.length == 0) {
-        let {newPack, newPool} = cardGetter.pickPack(cardPool,packSize);
+    if(Object.keys(users).length < maxDrafters) {
+        let {newPack, newPool} = cardGetter.pickPack(cardPool,packSize,cardsInPacks);
         cardPool = newPool;
+        cardsInPacks += packSize;
         console.log("new cardpool size = ", cardPool.length);
-        cards = newPack;
+        packs.push(newPack);
+        socket.emit('gen cards', packs[Object.keys(users).length]);
+        socket.emit('chat message', socket.id);
     }
-    socket.emit('gen cards', cards);
-    socket.emit('chat message', socket.id);
 
     socket.on('disconnect', () => {
         socket.removeAllListeners();
@@ -39,12 +43,10 @@ io.on('connection', (socket) => {
     });
     //handling new drafter registration
     socket.on('register drafter', () => {
-        users.push(socket.id);
-        if(users.length == 1) {
-            console.log('first drafter: ', socket.id);
-            socket.emit('next pick');
-        }
-        else(console.log('drafter num: ',users.length))
+        users[socket.id]=[userNum,false];
+        userNum++;
+        console.log('drafter ready: ', socket.id);
+        socket.emit('next pick');
     });
     //chat message handling
     socket.on('chat message', (msg) => {
@@ -52,11 +54,20 @@ io.on('connection', (socket) => {
     });
     //card draft handling
     socket.on('card drafted', (id) => {
-        delete cards[id];
-        socket.broadcast.emit("card drafted", id);
-        let drafter = nextDrafter();
-        console.log("next drafter:", drafter)
-        io.to(drafter).emit('next pick');
+        console.log("card recieved",id);
+        delete packs[users[socket.id][0]%packs.length][id];
+        users[socket.id][1] = true;
+        if(allUsersReady()) {
+            console.log("next draft round")
+            for(key in users) {
+                users[key][1]=false;
+                io.to(key).emit('next pick', packs[(users[key][0]++)%packs.length]);
+            }
+        }
+        //socket.broadcast.emit("card drafted", id);
+        else{
+            console.log(socket.id, " made a pick!");
+        }
     });
     
 });
@@ -66,17 +77,19 @@ http.listen(port, () => {
     console.log("listening on port 3000")
 });
 
-function nextDrafter () {
-    //probably doesn't work if drafters leave mid way through (users array only adds, doesn't remove upon clients leaving)
-    userNum++;
-    return users[(userNum)%users.length];
+function allUsersReady () {
+    for(key in users) {
+        if(users[key][1]==false) {
+            return false;
+        }
+    }
+    return true;
 }
 /*----FUTURE FEATURES----*/
 
-//make non-repeating random packs of 15 from the cards
 //each player gets a pack (like real drafting)
 //variable player cap (refuse entry to additional clients)
 //stop and reset if someone leaves
 
-//login page
+//landing page
 //get it hosted on AWS

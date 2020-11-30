@@ -19,13 +19,13 @@ function getCardImagePaths () {
     return cards;
 }
 
-function pickPack (cardPool, packSize) {
+function pickPack (cardPool, packSize, idStart) {
     let newPack = {};
     for(let i=0; i<packSize; i++) {
         let rand = Math.floor(Math.random() * packSize);
         let card = cardPool[rand];
-        console.log(card);
-        newPack[i]=`<div class="card" id="${i}" style='background-image:url("${card}")'></div>`;
+        // console.log(card);
+        newPack[i+idStart]=`<div class="card" id="${i+idStart}" style='background-image:url("${card}")'></div>`;
         cardPool.splice(rand,1);      
     }
     let newPool = cardPool;
