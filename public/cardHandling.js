@@ -1,5 +1,7 @@
+let nextPick = false;
+const socket = io();
+
 $(function () {
-    var socket = io();
     $('form').submit(function(e) {
         e.preventDefault(); // prevents page reloading
         socket.emit('chat message', $('#m').val());
@@ -13,10 +15,13 @@ $(function () {
 
 //handles cards being clicked on and taken out of the draft pool
 $(function () {
-    var socket = io();
     $(document).on('click', '.card', function() {
-        $('#user').append($(this).detach());
-        socket.emit('card drafted', $(this).attr('id'));
+        if(nextPick && $(this).parent('#public').length)  {
+            $('#user').css("background", "ivory");
+            $('#user').append($(this).detach());
+            socket.emit('card drafted', $(this).attr('id'));
+            nextPick = false;
+        }
     });
     socket.on('card drafted', function(id) {
         $('#' + id).remove();
@@ -25,11 +30,19 @@ $(function () {
 
 //handles adding cards to DOM
 $(function () {
-    var socket = io();
     socket.on('gen cards', function(cards) {
         console.log(cards.length);
         for(let key in cards) {
             $('#public').append(cards[key]);
         }
+        socket.emit('register drafter');
+    });
+});
+
+//handles becoming the active drafter
+$(function () {
+    socket.on('next pick', function() {
+        nextPick = true;
+        $('#user').css("background", "cyan");
     });
 });

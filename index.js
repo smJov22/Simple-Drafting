@@ -14,6 +14,8 @@ app.get('/', (req,res) => {
 
 let packSize = 4;
 let cards = genCardHtml(packSize);
+let users = [];
+let userNum = 0;
 
 io.on('connection', (socket) => {
     console.log("new connection: ", socket.id);
@@ -21,10 +23,20 @@ io.on('connection', (socket) => {
         cards = genCardHtml(packSize); 
     }
     socket.emit('gen cards', cards);
+    socket.emit('chat message', socket.id);
 
     socket.on('disconnect', () => {
         socket.removeAllListeners();
         console.log("user disconnected");
+    });
+    //handling new drafter registration
+    socket.on('register drafter', () => {
+        users.push(socket.id);
+        if(users.length == 1) {
+            console.log('first drafter: ', socket.id);
+            socket.emit('next pick');
+        }
+        else(console.log('drafter num: ',users.length))
     });
     //chat message handling
     socket.on('chat message', (msg) => {
@@ -34,6 +46,9 @@ io.on('connection', (socket) => {
     socket.on('card drafted', (id) => {
         delete cards[id];
         socket.broadcast.emit("card drafted", id);
+        let drafter = nextDrafter();
+        console.log("next drafter:", drafter)
+        io.to(drafter).emit('next pick');
     });
     
 });
@@ -52,3 +67,16 @@ function genCardHtml (num) {
     }
     return cardHtml;
 }
+
+function nextDrafter () {
+    //probably doesn't work if drafters leave mid way through (users array only adds, doesn't remove upon clients leaving)
+    console.log('userNum, totalUsers: ',userNum,', ', users.length)
+    userNum++;
+    return users[(userNum)%users.length];
+}
+/*----FEATURE REQUESTS----*/
+
+//take turns in drafting
+
+//retrieve 45 cards from the cube
+//make non-repeating random packs of 15 from the cards
